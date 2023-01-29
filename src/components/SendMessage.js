@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { auth, db } from "../firebase";
+import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase";
 
-const SendMessage = ({ scroll }) => {
+const SendMessage = ({ auth }) => {
   const [message, setMessage] = useState("");
 
-  const sendMessage = async (event) => {
-    event.preventDefault();
+  const sendMessage = async (e) => {
+    e.preventDefault();
     if (message.trim() === "") {
-      alert("Enter valid message");
+      alert("Please type a valid message");
       return;
     }
     const { uid, displayName, photoURL } = auth.currentUser;
@@ -20,23 +20,17 @@ const SendMessage = ({ scroll }) => {
       uid,
     });
     setMessage("");
-    scroll.current.scrollIntoView({ behavior: "smooth" });
   };
+
   return (
-    <form onSubmit={(event) => sendMessage(event)} className="send-message">
-      <label htmlFor="messageInput" hidden>
-        Enter Message
-      </label>
+    <form onSubmit={sendMessage} className='mt-5'>
       <input
-        id="messageInput"
-        name="messageInput"
-        type="text"
-        className="form-input__input"
+        className="form-control"
         placeholder="type message..."
         value={message}
         onChange={(e) => setMessage(e.target.value)}
       />
-      <button type="submit">Send</button>
+      <button type="submit" className='btn btn-sm btn-primary w-100'>Send</button>
     </form>
   );
 };

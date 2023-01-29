@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import {
   query,
   collection,
@@ -10,9 +10,8 @@ import { db } from "../firebase";
 import Message from "./Message";
 import SendMessage from "./SendMessage";
 
-const ChatBox = () => {
+const ChatBox = ({user, auth}) => {
   const [messages, setMessages] = useState([]);
-  const scroll = useRef();
 
   useEffect(() => {
     const q = query(
@@ -20,7 +19,6 @@ const ChatBox = () => {
       orderBy("createdAt"),
       limit(50)
     );
-
     const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
       let messages = [];
       QuerySnapshot.forEach((doc) => {
@@ -28,20 +26,24 @@ const ChatBox = () => {
       });
       setMessages(messages);
     });
+
     return () => unsubscribe;
   }, []);
 
   return (
-    <main className="chat-box">
-      <div className="messages-wrapper">
-        {messages?.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
+    <div className='shadow-lg p-3 mb-5 bg-body-tertiary rounded'>
+      <div className="card w-100">
+        <div className="card-header">
+          Chat
+        </div>
+        <ul className="list-group list-group-flush">
+          {messages?.map((message) => (
+              <Message key={message.id} message={message} user={user}/>
+          ))}
+        </ul>
       </div>
-      {/* when a new message enters the chat, the screen scrolls dowwn to the scroll div */}
-      <span ref={scroll}></span>
-      <SendMessage scroll={scroll} />
-    </main>
+      <SendMessage auth={auth}/>
+    </div>
   );
 };
 
